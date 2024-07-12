@@ -1,0 +1,11 @@
+curl textfile
+
+open the text file and loop through
+every line with Disallow: to be put into new_list
+
+
+for every item in new_list; split at ' '(space)
+
+Put the directories in a new list
+
+create a textfile => directories

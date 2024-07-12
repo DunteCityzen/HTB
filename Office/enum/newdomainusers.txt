@@ -1,0 +1,15 @@
+SMB                      10.10.11.3      445    DC               [*] Windows Server 2022 Build 20348 (name:DC) (domain:office.htb) (signing:True) (SMBv1:False)
+SMB                      10.10.11.3      445    DC               [+] office.htb\tstark:playboy69 
+SMB                      10.10.11.3      445    DC               [+] Enumerated domain user(s)
+SMB                      10.10.11.3      445    DC               office.htb\web_account                    badpwdcount: 1 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\tstark                         badpwdcount: 1 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\dlanor                         badpwdcount: 1 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\dmichael                       badpwdcount: 1 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\dwolfe                         badpwdcount: 0 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\etower                         badpwdcount: 2 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\EWhite                         badpwdcount: 2 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\HHogan                         badpwdcount: 1 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\PPotts                         badpwdcount: 1 desc: 
+SMB                      10.10.11.3      445    DC               office.htb\krbtgt                         badpwdcount: 0 desc: Key Distribution Center Service Account
+SMB                      10.10.11.3      445    DC               office.htb\Guest                          badpwdcount: 0 desc: Built-in account for guest access to the computer/domain
+SMB                      10.10.11.3      445    DC               office.htb\Administrator                  badpwdcount: 0 desc: Built-in account for administering the computer/domain
